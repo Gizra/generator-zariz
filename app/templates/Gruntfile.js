@@ -315,7 +315,7 @@ module.exports = function (grunt) {
 
     replace: {
       pages: {
-        src: ['<%%= yeoman.app %>/pages/node/*.html'],
+        src: ['<%%= yeoman.app %>/pages/**/*.html'],
         // Overwrite matched source files
         overwrite: true,
         replacements: [{
