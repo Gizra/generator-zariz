@@ -334,7 +334,8 @@ module.exports = function (grunt) {
           }
         }, {
           from: '/sites/default/files/',
-          to: '/<%%= yeoman.basePath %>'
+          // @todo: Remove the double slashes.
+          to: '/<%%= yeoman.basePath %>/images/'
         }, {
           from: 'sites/all/themes/<%%= yeoman.drupalTheme %>/',
           to: '/<%%= yeoman.basePath %>'
