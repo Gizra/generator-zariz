@@ -428,7 +428,7 @@ module.exports = function (grunt) {
           url = url.replace(/\?.*/g, '');
           return url.replace(grunt.config.get('yeoman.drupalSite') + '/sites/default/files', '');
         },
-        dest: grunt.config.get('yeoman.app') + '/assets'
+        dest: grunt.config.get('yeoman.app')
       }
     };
 
