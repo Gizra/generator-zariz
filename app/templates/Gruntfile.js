@@ -320,10 +320,10 @@ module.exports = function (grunt) {
         overwrite: true,
         replacements: [{
           from: '<%%= yeoman.drupalSite %>/',
-          to: '/<%%= yeoman.basePath %>'
+          to: '<%%= yeoman.basePath %>'
         }, {
           from: '/<%%= yeoman.drupalDomain %>/',
-          to: '/<%%= yeoman.basePath %>'
+          to: '<%%= yeoman.basePath %>'
         }, {
           from: /sites\/default\/files\/.*?"/g,
           to: function(value) {
@@ -334,11 +334,10 @@ module.exports = function (grunt) {
           }
         }, {
           from: '/sites/default/files/',
-          // @todo: Remove the double slashes.
-          to: '/<%%= yeoman.basePath %>/images/'
+          to: '<%%= yeoman.basePath %>images/'
         }, {
           from: 'sites/all/themes/<%%= yeoman.drupalTheme %>/',
-          to: '/<%%= yeoman.basePath %>'
+          to: '<%%= yeoman.basePath %>'
         }]
       }
     },
@@ -429,7 +428,7 @@ module.exports = function (grunt) {
           url = url.replace(/\?.*/g, '');
           return url.replace(grunt.config.get('yeoman.drupalSite') + '/sites/default/files', '');
         },
-        dest: grunt.config.get('yeoman.app')
+        dest: grunt.config.get('yeoman.app') + '/images'
       }
     };
 
