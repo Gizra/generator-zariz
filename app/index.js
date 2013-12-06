@@ -98,7 +98,7 @@ ZarizGenerator.prototype.askForBasePath = function askFor() {
 ZarizGenerator.prototype.app = function app() {
   this.mkdir('app');
 
-  this.template('Gruntfile.js');
+  this.template('Gruntfile.js', 'Gruntfile.js');
 
   this.copy('_package.json', 'package.json');
   this.copy('_bower.json', 'bower.json');

@@ -1,12 +1,4 @@
 // Generated on <%= (new Date).toISOString().split('T')[0] %> using <%= pkg.name %> <%= pkg.version %>
-
-// # Globbing
-// for performance reasons we're only matching one level down:
-// 'test/spec/{,*/}*.js'
-// use this if you want to recursively match all subfolders:
-// 'test/spec/**/*.js'
-
-// Generated on 2013-12-06 using generator-angular 0.6.0
 'use strict';
 
 // # Globbing
@@ -31,6 +23,7 @@ module.exports = function (grunt) {
       // configurable paths
       app: require('./bower.json').appPath || 'app',
       dist: 'dist',
+      // Zariz related variables.
       drupalHost: '<%= drupalHost %>',
       drupalDomain: '<%= drupalDomain %>',
       drupalTheme: '<%= drupalTheme %>',
@@ -56,7 +49,7 @@ module.exports = function (grunt) {
       },
       livereload: {
         options: {
-          livereload: '<%= connect.options.livereload %>'
+          livereload: '<%%= connect.options.livereload %>'
         },
         files: [
           '<%= yeoman.app %>/{,*/}*.html',
@@ -147,10 +140,6 @@ module.exports = function (grunt) {
         }]
       }
     },
-
-
-
-
 
     // Renames files for browser caching purposes
     rev: {
@@ -354,7 +343,7 @@ module.exports = function (grunt) {
           'node/2',
           'node/3',
           'node/4',
-          'node/5',
+          'node/5'
         ]
       }
     },
