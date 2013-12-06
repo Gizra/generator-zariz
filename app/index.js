@@ -16,21 +16,80 @@ var ZarizGenerator = module.exports = function ZarizGenerator(args, options, con
 
 util.inherits(ZarizGenerator, yeoman.generators.Base);
 
-ZarizGenerator.prototype.askFor = function askFor() {
+/**
+ * Ask for the Drupal host.
+ */
+ZarizGenerator.prototype.askForDrupalHost = function askFor() {
   var cb = this.async();
 
   // have Yeoman greet the user.
   console.log(this.yeoman);
 
   var prompts = [{
-    type: 'confirm',
-    name: 'someOption',
-    message: 'Would you like to enable this option?',
-    default: true
+    name: 'drupalHost',
+    message: 'What is your Drupal installation host? You may include the port number.',
+    default: 'http://localhost'
   }];
 
   this.prompt(prompts, function (props) {
-    this.someOption = props.someOption;
+    this.drupalHost = props.drupalHost;
+
+    cb();
+  }.bind(this));
+};
+
+/**
+ * Ask for the Drupal domain.
+ */
+ZarizGenerator.prototype.askForDrupalDomain = function askFor() {
+  var cb = this.async();
+
+  var prompts = [{
+    name: 'drupalDomain',
+    message: 'What is your domain?',
+    default: 'drupal'
+  }];
+
+  this.prompt(prompts, function (props) {
+    this.drupalDomain = props.drupalDomain;
+
+    cb();
+  }.bind(this));
+};
+
+/**
+ * Get the Drupal theme name.
+ */
+ZarizGenerator.prototype.askForDrupalTheme = function askFor() {
+  var cb = this.async();
+
+  var prompts = [{
+    name: 'drupalTheme',
+    message: 'What is your theme name?',
+    default: 'zrizi'
+  }];
+
+  this.prompt(prompts, function (props) {
+    this.drupalTheme = props.drupalTheme;
+
+    cb();
+  }.bind(this));
+};
+
+/**
+ * Get the static site's base path.
+ */
+ZarizGenerator.prototype.askForBasePath = function askFor() {
+  var cb = this.async();
+
+  var prompts = [{
+    name: 'basePath',
+    message: 'What is the static site base path? For example if you host your site on example.github.io/your-site, then the base path should be "your-site". Otherwise, if you host your site on example.com, leave this blank.',
+    default: ''
+  }];
+
+  this.prompt(prompts, function (props) {
+    this.basePath = props.basePath;
 
     cb();
   }.bind(this));
