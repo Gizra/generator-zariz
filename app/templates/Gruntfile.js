@@ -15,6 +15,8 @@ module.exports = function (grunt) {
   // Time how long tasks take. Can help when optimizing build times
   require('time-grunt')(grunt);
 
+  var _ = require('underscore');
+
   // Define the configuration for all the tasks
   grunt.initConfig({
 
@@ -367,7 +369,7 @@ module.exports = function (grunt) {
     var sourceUrls = this.data.src;
     var urls = [];
     sourceUrls.forEach(function (src) {
-      urls.push(grunt.config.get('drupal') + '/' + src);
+      urls.push(grunt.config.get('yeoman.drupal') + '/' + src);
     });
 
     var config = {
@@ -376,10 +378,10 @@ module.exports = function (grunt) {
           urls
         ],
         router: function (url) {
-          url = url + '.html';
-          return url.replace(grunt.config.get('drupal'), '');
+          url = url + '/index.html';
+          return url.replace(grunt.config.get('yeoman.drupal'), '');
         },
-        dest: grunt.config.get('app') + '/pages'
+        dest: grunt.config.get('yeoman.app') + '/pages'
       }
     };
 
@@ -421,9 +423,9 @@ module.exports = function (grunt) {
         ],
         router: function (url) {
           url = url.replace(/\?.*/g, '');
-          return url.replace(grunt.config.get('drupal') + '/sites/default/files', '');
+          return url.replace(grunt.config.get('yeoman.drupal') + '/sites/default/files', '');
         },
-        dest: grunt.config.get('app') + '/assets'
+        dest: grunt.config.get('yeoman.app') + '/assets'
       }
     };
 
