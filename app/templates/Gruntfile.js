@@ -38,7 +38,7 @@ module.exports = function (grunt) {
       },
       jsTest: {
         files: ['test/spec/{,*/}*.js'],
-        tasks: ['newer:jshint:test', 'karma']
+        tasks: ['newer:jshint:test']
       },
       styles: {
         files: ['<%= yeoman.app %>/styles/{,*/}*.css'],
@@ -319,7 +319,7 @@ module.exports = function (grunt) {
           from: /sites\/default\/files\/.*?"/g,
           to: function(value) {
             value = value.replace(/\?.*/g, '');
-            value = value.replace(yeoman.drupalFile, 'assets');
+            value = value.replace('sites/default/files', 'assets');
             // @todo: Improve logic.
             value = value + '"';
             return value;
@@ -367,7 +367,7 @@ module.exports = function (grunt) {
     var sourceUrls = this.data.src;
     var urls = [];
     sourceUrls.forEach(function (src) {
-      urls.push(yeoman.drupal + '/' + src);
+      urls.push(grunt.config.get('drupal') + '/' + src);
     });
 
     var config = {
@@ -377,9 +377,9 @@ module.exports = function (grunt) {
         ],
         router: function (url) {
           url = url + '.html';
-          return url.replace(yeoman.drupal, '');
+          return url.replace(grunt.config.get('drupal'), '');
         },
-        dest: yeoman.app + '/pages'
+        dest: grunt.config.get('app') + '/pages'
       }
     };
 
@@ -408,8 +408,6 @@ module.exports = function (grunt) {
 
       files = _.uniq(files);
 
-
-
       files.forEach(function(filePath) {
         filePaths.push(filePath.replace(/\"/g, ''));
       });
@@ -423,9 +421,9 @@ module.exports = function (grunt) {
         ],
         router: function (url) {
           url = url.replace(/\?.*/g, '');
-          return url.replace(yeoman.drupal + '/' + yeoman.drupalFile, '');
+          return url.replace(grunt.config.get('drupal') + '/sites/default/files', '');
         },
-        dest: yeoman.app + '/assets'
+        dest: grunt.config.get('app') + '/assets'
       }
     };
 
@@ -458,7 +456,6 @@ module.exports = function (grunt) {
     'concurrent:test',
     'autoprefixer',
     'connect:test',
-    'karma'
   ]);
 
   grunt.registerTask('build', [
