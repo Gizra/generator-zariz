@@ -319,13 +319,10 @@ module.exports = function (grunt) {
         // Overwrite matched source files
         overwrite: true,
         replacements: [{
-          from: '<%%= yeoman.drupalSiteSite %>/',
+          from: '<%%= yeoman.drupalSite %>/',
           to: '/<%%= yeoman.basePath %>'
         }, {
           from: '/<%%= yeoman.drupalDomain %>/',
-          to: '/<%%= yeoman.basePath %>'
-        }, {
-          from: '/sites/default/files/',
           to: '/<%%= yeoman.basePath %>'
         }, {
           from: /sites\/default\/files\/.*?"/g,
@@ -335,6 +332,9 @@ module.exports = function (grunt) {
             value = value + '"';
             return value;
           }
+        }, {
+          from: '/sites/default/files/',
+          to: '/<%%= yeoman.basePath %>'
         }, {
           from: 'sites/all/themes/<%%= yeoman.drupalTheme %>/',
           to: '/<%%= yeoman.basePath %>'
