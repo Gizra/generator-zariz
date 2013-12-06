@@ -315,26 +315,26 @@ module.exports = function (grunt) {
 
     replace: {
       pages: {
-        src: ['<%%= yeoman.app %>/pages/**/*.html'],
+        src: ['<%%= yeoman.app %>/**/*.html'],
         // Overwrite matched source files
         overwrite: true,
         replacements: [{
+          from: '<%%= yeoman.drupalSiteSite %>/',
+          to: '/<%%= yeoman.basePath %>'
+        }, {
+          from: '/<%%= yeoman.drupalDomain %>/',
+          to: '/<%%= yeoman.basePath %>'
+        }, {
+          from: '/sites/default/files/',
+          to: '/<%%= yeoman.basePath %>'
+        }, {
           from: /sites\/default\/files\/.*?"/g,
           to: function(value) {
             value = value.replace(/\?.*/g, '');
-            value = value.replace('sites/default/files', 'assets');
             // @todo: Improve logic.
             value = value + '"';
             return value;
           }
-        }, {
-          // Replace // Replace "example.com/my-site" with base Path.
-          from: '<%%= yeoman.drupalSiteSite %>/',
-          to: '/<%%= yeoman.basePath %>'
-        }, {
-          // Replace "/my-site" with base Path.
-          from: '/<%%= yeoman.drupalDomain %>/',
-          to: '/<%%= yeoman.basePath %>'
         }, {
           from: 'sites/all/themes/<%%= yeoman.drupalTheme %>/',
           to: '/<%%= yeoman.basePath %>'
@@ -354,7 +354,7 @@ module.exports = function (grunt) {
     },
     getFilesFromHtml: {
       files: {
-        src: ['<%%= yeoman.app %>/pages/node/*.html'],
+        src: ['<%%= yeoman.app %>/**/*.html'],
         dest: '<%%= yeoman.app %>/files'
       }
     },
@@ -384,7 +384,7 @@ module.exports = function (grunt) {
           url = url + '/index.html';
           return url.replace(grunt.config.get('yeoman.drupalSite'), '');
         },
-        dest: grunt.config.get('yeoman.app') + '/pages'
+        dest: grunt.config.get('yeoman.app')
       }
     };
 
