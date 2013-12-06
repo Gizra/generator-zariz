@@ -28,6 +28,7 @@ module.exports = function (grunt) {
       // Zariz related variables.
       drupalHost: '<%= drupalHost %>',
       drupalDomain: '<%= drupalDomain %>',
+      drupalSite: '<%%= yeoman.drupalHost %>/<%%= yeoman.drupalDomain %>',
       drupalTheme: '<%= drupalTheme %>',
       basePath: '<%= basePath %>'
     },
@@ -327,14 +328,16 @@ module.exports = function (grunt) {
             return value;
           }
         }, {
-          from: '<%= yeoman.drupal %>/',
-          to: '/<%= yeoman.base %>'
+          // Replace // Replace "example.com/my-site" with base Path.
+          from: '<%= yeoman.drupalSiteSite %>/',
+          to: '/<%= yeoman.basePath %>'
         }, {
-          from: '<%= yeoman.drupalBase %>/',
-          to: '/<%= yeoman.base %>'
+          // Replace "/my-site" with base Path.
+          from: '/<%= yeoman.drupalDomain %>/',
+          to: '/<%= yeoman.basePath %>'
         }, {
-          from: '<%= yeoman.drupalTheme %>/',
-          to: '/<%= yeoman.base %>'
+          from: 'sites/all/themes/<%= yeoman.drupalTheme %>/',
+          to: '/<%= yeoman.basePath %>'
         }]
       }
     },
@@ -369,7 +372,7 @@ module.exports = function (grunt) {
     var sourceUrls = this.data.src;
     var urls = [];
     sourceUrls.forEach(function (src) {
-      urls.push(grunt.config.get('yeoman.drupal') + '/' + src);
+      urls.push(grunt.config.get('yeoman.drupalSite') + '/' + src);
     });
 
     var config = {
@@ -379,7 +382,7 @@ module.exports = function (grunt) {
         ],
         router: function (url) {
           url = url + '/index.html';
-          return url.replace(grunt.config.get('yeoman.drupal'), '');
+          return url.replace(grunt.config.get('yeoman.drupalSite'), '');
         },
         dest: grunt.config.get('yeoman.app') + '/pages'
       }
@@ -423,7 +426,7 @@ module.exports = function (grunt) {
         ],
         router: function (url) {
           url = url.replace(/\?.*/g, '');
-          return url.replace(grunt.config.get('yeoman.drupal') + '/sites/default/files', '');
+          return url.replace(grunt.config.get('yeoman.drupalSite') + '/sites/default/files', '');
         },
         dest: grunt.config.get('yeoman.app') + '/assets'
       }
