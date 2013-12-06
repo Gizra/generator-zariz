@@ -97,13 +97,16 @@ ZarizGenerator.prototype.askForBasePath = function askFor() {
 
 ZarizGenerator.prototype.app = function app() {
   this.mkdir('app');
-  this.mkdir('app/templates');
+
+  this.template('Gruntfile.js');
 
   this.copy('_package.json', 'package.json');
   this.copy('_bower.json', 'bower.json');
 };
 
+
 ZarizGenerator.prototype.projectfiles = function projectfiles() {
   this.copy('editorconfig', '.editorconfig');
+  this.copy('gitignore', '.gitignore');
   this.copy('jshintrc', '.jshintrc');
 };
