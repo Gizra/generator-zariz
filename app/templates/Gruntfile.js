@@ -384,8 +384,13 @@ module.exports = function (grunt) {
 
       var config = {};
       _.each(urls.insert, function(url) {
-        var key = yeoman.app + '/' + url;
-        key.replace(yeoman.drupalSite, '');
+        var key = yeoman.app;
+        if (url !== 'index.php') {
+          // Not the main page.
+          key += '/' + url;
+          key.replace(yeoman.drupalSite, '');
+        }
+
         key += '/index.html';
         config[key] = yeoman.drupalSite + '/' + url;
       });
