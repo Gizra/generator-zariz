@@ -47,7 +47,7 @@ ZarizGenerator.prototype.askForDrupalDomain = function askFor() {
   var prompts = [{
     name: 'drupalDomain',
     message: 'What is your domain?',
-    default: 'drupal'
+    default: 'd7_dev'
   }];
 
   this.prompt(prompts, function (props) {

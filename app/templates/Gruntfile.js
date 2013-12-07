@@ -16,6 +16,7 @@ module.exports = function (grunt) {
   require('time-grunt')(grunt);
 
   var _ = require('underscore');
+  var request = require('request');
 
   // Define the configuration for all the tasks
   grunt.initConfig({
@@ -366,31 +367,42 @@ module.exports = function (grunt) {
     }
   });
 
-  grunt.registerMultiTask('getHtml', 'Get HTML from Drupal', function() {
-    // We need to prepare grunt-curl config on the fly based on the given
-    // URLs.
-    var sourceUrls = this.data.src;
-    var urls = [];
-    sourceUrls.forEach(function (src) {
-      urls.push(grunt.config.get('yeoman.drupalSite') + '/' + src);
-    });
+  grunt.registerTask('getHtml', 'Get HTML from Drupal', function(snapShotId) {
+    if (arguments.length === 0) {
+      grunt.fail.fatal('Snapshot ID is missing.');
+    }
 
-    var config = {
-      nodes: {
-        src: [
-          urls
-        ],
-        router: function (url) {
-          url = url + '/index.html';
-          return url.replace(grunt.config.get('yeoman.drupalSite'), '');
-        },
-        dest: grunt.config.get('yeoman.app')
-      }
+    var yeoman= {
+      'app': grunt.config.get('yeoman.app'),
+      'drupalSite': grunt.config.get('yeoman.drupalSite')
     };
 
-    grunt.config.set('curl-dir', config);
+
+    var config ={};
+
+    request(yeoman.drupalSite + '/content-by-snapshot/' + snapShotId, function (error, response, body) {
+      if (error || response.statusCode !== 200) {
+        // grunt.fail.fatal('Error contacting Drupal site.');
+        // @todo: Remove hardcoding.
+        // We need to prepare grunt-curl config on the fly based on the given
+        // URLs.
+      }
+    });
+
+    config = {
+      'foo/bar': 'http://localhost/d7_dev/node/1',
+      'mik/muk': 'http://localhost/d7_dev/node/2'
+    };
+
+    // Add "/index.html" to each path.
+    _.each(config, function(url, key) {
+      delete config[key];
+      config[yeoman.app + '/' + key + '/index.html'] = url;
+    });
+
+    grunt.config.set('curl', config);
     return grunt.task.run([
-      'curl-dir',
+      'curl',
       'getFilesFromHtml',
       'replace'
     ]);
