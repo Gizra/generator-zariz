@@ -370,14 +370,10 @@ module.exports = function (grunt) {
     // Task is asynchronous.
     var done = this.async();
 
-    var config ={};
 
     request(yeoman.drupalSite + '/pages-by-snapshot/' + snapShotId, function (error, response, body) {
       if (error || response.statusCode !== 200) {
         grunt.fail.fatal('Error contacting Drupal site.');
-        // @todo: Remove hardcoding.
-        // We need to prepare grunt-curl config on the fly based on the given
-        // URLs.
       }
 
       var urls = JSON.parse(body);
