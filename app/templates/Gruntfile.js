@@ -57,7 +57,7 @@ module.exports = function (grunt) {
         files: [
           '<%%= yeoman.app %>/{,*/}*.html',
           '.tmp/styles/{,*/}*.css',
-          '<%%= yeoman.app %>/images/{,*/}*.{png,jpg,jpeg,gif,webp,svg}'
+          '<%%= yeoman.app %>/assets/{,*/}*.{png,jpg,jpeg,gif,webp,svg}'
         ]
       }
     },
@@ -151,7 +151,7 @@ module.exports = function (grunt) {
           src: [
             '<%%= yeoman.dist %>/scripts/{,*/}*.js',
             '<%%= yeoman.dist %>/styles/{,*/}*.css',
-            '<%%= yeoman.dist %>/images/{,*/}*.{png,jpg,jpeg,gif,webp,svg}',
+            '<%%= yeoman.dist %>/assets/{,*/}*.{png,jpg,jpeg,gif,webp,svg}',
             '<%%= yeoman.dist %>/styles/fonts/*'
           ]
         }
@@ -182,9 +182,9 @@ module.exports = function (grunt) {
       dist: {
         files: [{
           expand: true,
-          cwd: '<%%= yeoman.app %>/images',
+          cwd: '<%%= yeoman.app %>/assets',
           src: '{,*/}*.{png,jpg,jpeg,gif}',
-          dest: '<%%= yeoman.dist %>/images'
+          dest: '<%%= yeoman.dist %>/assets'
         }]
       }
     },
@@ -192,9 +192,9 @@ module.exports = function (grunt) {
       dist: {
         files: [{
           expand: true,
-          cwd: '<%%= yeoman.app %>/images',
+          cwd: '<%%= yeoman.app %>/assets',
           src: '{,*/}*.svg',
-          dest: '<%%= yeoman.dist %>/images'
+          dest: '<%%= yeoman.dist %>/assets'
         }]
       }
     },
@@ -251,13 +251,13 @@ module.exports = function (grunt) {
             '*.{ico,png,txt}',
             '.htaccess',
             'bower_components/**/*',
-            'images/{,*/}*.{webp}',
+            'assets/{,*/}*.{webp}',
             'fonts/*'
           ]
         }, {
           expand: true,
-          cwd: '.tmp/images',
-          dest: '<%%= yeoman.dist %>/images',
+          cwd: '.tmp/assets',
+          dest: '<%%= yeoman.dist %>/assets',
           src: [
             'generated/*'
           ]
@@ -334,7 +334,7 @@ module.exports = function (grunt) {
           }
         }, {
           from: '/sites/default/files/',
-          to: '<%%= yeoman.basePath %>images/'
+          to: '<%%= yeoman.basePath %>assets/'
         }, {
           from: 'sites/all/themes/<%%= yeoman.drupalTheme %>/',
           to: '<%%= yeoman.basePath %>'
@@ -428,7 +428,7 @@ module.exports = function (grunt) {
           url = url.replace(/\?.*/g, '');
           return url.replace(grunt.config.get('yeoman.drupalSite') + '/sites/default/files', '');
         },
-        dest: grunt.config.get('yeoman.app') + '/images'
+        dest: grunt.config.get('yeoman.app') + '/assets'
       }
     };
 
