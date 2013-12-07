@@ -372,23 +372,22 @@ module.exports = function (grunt) {
 
     var config ={};
 
-    request(yeoman.drupalSite + '/content-by-snapshot/' + snapShotId, function (error, response, body) {
+    request(yeoman.drupalSite + '/pages-by-snapshot/' + snapShotId, function (error, response, body) {
       if (error || response.statusCode !== 200) {
-        // grunt.fail.fatal('Error contacting Drupal site.');
+        grunt.fail.fatal('Error contacting Drupal site.');
         // @todo: Remove hardcoding.
         // We need to prepare grunt-curl config on the fly based on the given
         // URLs.
       }
 
-      config = {
-        'foo/bar': 'http://localhost/d7_dev/node/1',
-        'mik/muk': 'http://localhost/d7_dev/node/2'
-      };
+      var urls = JSON.parse(body);
 
-      // Add "/index.html" to each path.
-      _.each(config, function(url, key) {
-        delete config[key];
-        config[yeoman.app + '/' + key + '/index.html'] = url;
+      var config = {};
+      _.each(urls.insert, function(url) {
+        var key = yeoman.app + '/' + url;
+        key.replace(yeoman.drupalSite, '');
+        key += '/index.html';
+        config[key] = yeoman.drupalSite + '/' + url;
       });
 
       grunt.config.set('curl', config);
