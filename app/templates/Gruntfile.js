@@ -342,17 +342,6 @@ module.exports = function (grunt) {
         }]
       }
     },
-    getHtml: {
-      urls: {
-        src: [
-          'node/1',
-          'node/2',
-          'node/3',
-          'node/4',
-          'node/5'
-        ]
-      }
-    },
     getFilesFromHtml: {
       files: {
         src: ['<%%= yeoman.app %>/**/*.html'],
@@ -378,6 +367,9 @@ module.exports = function (grunt) {
     };
 
 
+    // Task is asynchronous.
+    var done = this.async();
+
     var config ={};
 
     request(yeoman.drupalSite + '/content-by-snapshot/' + snapShotId, function (error, response, body) {
@@ -387,25 +379,28 @@ module.exports = function (grunt) {
         // We need to prepare grunt-curl config on the fly based on the given
         // URLs.
       }
+
+      config = {
+        'foo/bar': 'http://localhost/d7_dev/node/1',
+        'mik/muk': 'http://localhost/d7_dev/node/2'
+      };
+
+      // Add "/index.html" to each path.
+      _.each(config, function(url, key) {
+        delete config[key];
+        config[yeoman.app + '/' + key + '/index.html'] = url;
+      });
+
+      grunt.config.set('curl', config);
+      grunt.task.run([
+        'curl',
+        'getFilesFromHtml',
+        'replace'
+      ]);
+
+      // Task finished.
+      done();
     });
-
-    config = {
-      'foo/bar': 'http://localhost/d7_dev/node/1',
-      'mik/muk': 'http://localhost/d7_dev/node/2'
-    };
-
-    // Add "/index.html" to each path.
-    _.each(config, function(url, key) {
-      delete config[key];
-      config[yeoman.app + '/' + key + '/index.html'] = url;
-    });
-
-    grunt.config.set('curl', config);
-    return grunt.task.run([
-      'curl',
-      'getFilesFromHtml',
-      'replace'
-    ]);
   });
 
   grunt.registerMultiTask('getFilesFromHtml', 'Get files from a single HTML page', function() {
