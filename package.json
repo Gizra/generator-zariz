@@ -1,9 +1,11 @@
 {
   "name": "generator-zariz",
-  "version": "0.0.0",
-  "description": "A generator for Yeoman",
+  "version": "0.1.0",
+  "description": "Generator for static site from a Drupal installation built with the Zariz module suite.",
   "keywords": [
-    "yeoman-generator"
+    "yeoman-generator",
+    "Drupal",
+    "static-site"
   ],
   "homepage": "https://github.com/Gizra/generator-zariz",
   "bugs": "https://github.com/Gizra/generator-zariz/issues",
