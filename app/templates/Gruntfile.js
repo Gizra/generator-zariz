@@ -314,6 +314,15 @@ module.exports = function (grunt) {
     //   dist: {}
     // },
 
+    // Copy Drupal theme assets (CSS and images).
+    'curl-dir': {
+      '<%= yeoman.app %>/styles': [
+        '<%%= yeoman.drupalSite %>/sites/all/themes/<%%= yeoman.drupalTheme %>/css/style.css'
+      ],
+      '<%= yeoman.app %>/assets': [
+        '<%%= yeoman.drupalSite %>/sites/all/themes/<%%= yeoman.drupalTheme %>/logo.png'
+      ]
+    },
     replace: {
       pages: {
         src: ['<%%= yeoman.app %>/**/*.html'],
