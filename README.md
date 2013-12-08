@@ -1,4 +1,4 @@
-# generator-zariz [![Build Status](https://secure.travis-ci.org/amitaibu/generator-zariz.png?branch=master)](https://travis-ci.org/Gizra/generator-zariz)
+# generator-zariz [![Build Status](https://secure.travis-ci.org/Gizra/generator-zariz.png?branch=master)](https://travis-ci.org/Gizra/generator-zariz)
 
 A generator for [Yeoman](http://yeoman.io).
 
