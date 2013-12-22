@@ -95,6 +95,25 @@ ZarizGenerator.prototype.askForBasePath = function askFor() {
   }.bind(this));
 };
 
+/**
+ * Get the static site's "master" branch.
+ */
+ZarizGenerator.prototype.askForMasterBranch = function askFor() {
+  var cb = this.async();
+
+  var prompts = [{
+    name: 'drupalMasterBranch',
+    message: 'What is the name of the master branch.',
+    default: 'live'
+  }];
+
+  this.prompt(prompts, function (props) {
+    this.drupalMasterBranch = props.drupalMasterBranch;
+
+    cb();
+  }.bind(this));
+};
+
 ZarizGenerator.prototype.app = function app() {
   this.mkdir('app');
 

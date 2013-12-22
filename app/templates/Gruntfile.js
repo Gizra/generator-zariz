@@ -31,6 +31,7 @@ module.exports = function (grunt) {
       drupalDomain: '<%= drupalDomain %>',
       drupalSite: '<%%= yeoman.drupalHost %>/<%%= yeoman.drupalDomain %>',
       drupalTheme: '<%= drupalTheme %>',
+      drupalMasterBranch: '<%= drupalMasterBranch %>',
       basePath: '<%= basePath %>'
     },
 
@@ -329,7 +330,13 @@ module.exports = function (grunt) {
         // Overwrite matched source files
         overwrite: true,
         replacements: [{
+          from: '<%%= yeoman.drupalSite %>/<%%= yeoman.drupalMasterBranch %>/',
+          to: '<%%= yeoman.basePath %>'
+        }, {
           from: '<%%= yeoman.drupalSite %>/',
+          to: '<%%= yeoman.basePath %>'
+        }, {
+          from: '<%%= yeoman.drupalDomain %>/<%%= yeoman.drupalMasterBranch %>/',
           to: '<%%= yeoman.basePath %>'
         }, {
           from: '/<%%= yeoman.drupalDomain %>/',
