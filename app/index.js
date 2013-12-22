@@ -84,8 +84,8 @@ ZarizGenerator.prototype.askForBasePath = function askFor() {
 
   var prompts = [{
     name: 'basePath',
-    message: 'What is the static site base path? For example if you host your site on example.github.io/your-site, then the base path should be "your-site". Otherwise, if you host your site on example.com, then use "/".',
-    default: '/'
+    message: 'What is the static site base path? For example if you host your site on example.github.io/your-site, then the base path should be "/your-site"',
+    default: ''
   }];
 
   this.prompt(prompts, function (props) {
