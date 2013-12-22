@@ -365,11 +365,7 @@ module.exports = function (grunt) {
     }
   });
 
-  grunt.registerTask('getHtml', 'Get HTML from Drupal', function(snapShotId) {
-    if (arguments.length === 0) {
-      grunt.fail.fatal('Snapshot ID is missing.');
-    }
-
+  grunt.registerTask('getHtml', 'Get HTML from Drupal', function() {
     var yeoman= {
       'app': grunt.config.get('yeoman.app'),
       'drupalSite': grunt.config.get('yeoman.drupalSite')
@@ -380,7 +376,7 @@ module.exports = function (grunt) {
     var done = this.async();
 
 
-    request(yeoman.drupalSite + '/pages-by-snapshot/' + snapShotId, function (error, response, body) {
+    request(yeoman.drupalSite + '/zariz-pages', function (error, response, body) {
       if (error || response.statusCode !== 200) {
         grunt.fail.fatal('Error contacting Drupal site.');
       }
