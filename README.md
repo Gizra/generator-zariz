@@ -14,7 +14,7 @@ yo zariz
 ### Grunt commands
 
 * ``grunt curl-dir`` will copy the ``style.scss`` and ``logo.png`` from the theme you use. This is a one time command.
-* ``grunt getHtml:1`` will get the HTML and assets of all the pages that belong to Snapshot with ID 1.
+* ``grunt getHtml`` will get the HTML and assets of all the latest pages added to the "master" branch
 * ``grunt gh-pages`` will push the static site to Github pages
 
 ## License
