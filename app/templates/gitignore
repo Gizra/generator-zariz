@@ -1,4 +1,5 @@
 node_modules
+stage
 dist
 .tmp
 .sass-cache

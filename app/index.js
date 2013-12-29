@@ -66,7 +66,7 @@ ZarizGenerator.prototype.askForDrupalTheme = function askFor() {
   var prompts = [{
     name: 'drupalTheme',
     message: 'What is your theme name?',
-    default: 'zrizi'
+    default: 'bootstrap'
   }];
 
   this.prompt(prompts, function (props) {
