@@ -1,6 +1,6 @@
 {
   "name": "generator-zariz",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Generator for static site from a Drupal installation built with the Zariz module suite.",
   "keywords": [
     "yeoman-generator",
