@@ -26,6 +26,7 @@ module.exports = function (grunt) {
       // configurable paths
       app: require('./bower.json').appPath || 'app',
       dist: 'dist',
+      stage: 'stage',
       // Zariz related variables.
       drupalHost: '<%= drupalHost %>',
       drupalDomain: '<%= drupalDomain %>',
@@ -40,10 +41,6 @@ module.exports = function (grunt) {
       js: {
         files: ['{.tmp,<%%= yeoman.app %>}/scripts/{,*/}*.js'],
         tasks: ['newer:jshint:all']
-      },
-      jsTest: {
-        files: ['test/spec/{,*/}*.js'],
-        tasks: ['newer:jshint:test']
       },
       styles: {
         files: ['<%%= yeoman.app %>/styles/{,*/}*.css'],
@@ -128,6 +125,16 @@ module.exports = function (grunt) {
           ]
         }]
       },
+      stage: {
+        files: [{
+          dot: true,
+          src: [
+            '.tmp',
+            '<%%= yeoman.stage %>/*',
+            '!<%%= yeoman.stage %>/.git*'
+          ]
+        }]
+      },
       server: '.tmp'
     },
 
@@ -164,7 +171,7 @@ module.exports = function (grunt) {
     // concat, minify and revision files. Creates configurations in memory so
     // additional tasks can operate on them
     useminPrepare: {
-      html: '<%%= yeoman.app %>/index.html',
+      html: '<%%= yeoman.stage %>/index.html',
       options: {
         dest: '<%%= yeoman.dist %>'
       }
@@ -172,8 +179,8 @@ module.exports = function (grunt) {
 
     // Performs rewrites based on rev and the useminPrepare configuration
     usemin: {
-      html: ['<%%= yeoman.dist %>/{,*/}*.html'],
-      css: ['<%%= yeoman.dist %>/styles/{,*/}*.css'],
+      html: ['<%%= yeoman.dist %>/**/*.html'],
+      css: ['<%%= yeoman.dist %>/styles/**/*.css'],
       options: {
         assetsDirs: ['<%%= yeoman.dist %>']
       }
@@ -184,8 +191,8 @@ module.exports = function (grunt) {
       dist: {
         files: [{
           expand: true,
-          cwd: '<%%= yeoman.app %>/assets',
-          src: '{,*/}*.{png,jpg,jpeg,gif}',
+          cwd: '<%%= yeoman.stage %>/assets',
+          src: '**/*.{png,jpg,jpeg,gif}',
           dest: '<%%= yeoman.dist %>/assets'
         }]
       }
@@ -194,7 +201,7 @@ module.exports = function (grunt) {
       dist: {
         files: [{
           expand: true,
-          cwd: '<%%= yeoman.app %>/assets',
+          cwd: '<%%= yeoman.stage %>/assets',
           src: '{,*/}*.svg',
           dest: '<%%= yeoman.dist %>/assets'
         }]
@@ -214,22 +221,9 @@ module.exports = function (grunt) {
         },
         files: [{
           expand: true,
-          cwd: '<%%= yeoman.app %>',
+          cwd: '<%%= yeoman.stage %>',
           src: ['*.html', 'views/*.html'],
           dest: '<%%= yeoman.dist %>'
-        }]
-      }
-    },
-
-    // Allow the use of non-minsafe AngularJS files. Automatically makes it
-    // minsafe compatible so Uglify does not destroy the ng references
-    ngmin: {
-      dist: {
-        files: [{
-          expand: true,
-          cwd: '.tmp/concat/scripts',
-          src: '*.js',
-          dest: '.tmp/concat/scripts'
         }]
       }
     },
@@ -247,7 +241,7 @@ module.exports = function (grunt) {
         files: [{
           expand: true,
           dot: true,
-          cwd: '<%%= yeoman.app %>',
+          cwd: '<%%= yeoman.stage %>',
           dest: '<%%= yeoman.dist %>',
           src: [
             '*.{ico,png,txt}',
@@ -265,9 +259,28 @@ module.exports = function (grunt) {
           ]
         }]
       },
+      stage: {
+        files: [{
+          expand: true,
+          dot: true,
+          cwd: '<%%= yeoman.stage %>',
+          dest: '<%%= yeoman.app %>',
+          src: [
+            '*',
+            '**/*'
+          ]
+        }, {
+          expand: true,
+          cwd: '.tmp/assets',
+          dest: '<%%= yeoman.stage %>/assets',
+          src: [
+            'generated/*'
+          ]
+        }]
+      },
       styles: {
         expand: true,
-        cwd: '<%%= yeoman.app %>/styles',
+        cwd: '<%%= yeoman.stage %>/styles',
         dest: '.tmp/styles/',
         src: '{,*/}*.css'
       }
@@ -315,53 +328,100 @@ module.exports = function (grunt) {
     //   dist: {}
     // },
 
-    // Copy Drupal theme assets (CSS and images).
     'curl-dir': {
-      '<%%= yeoman.app %>/styles': [
-        '<%%= yeoman.drupalSite %>/sites/all/themes/<%%= yeoman.drupalTheme %>/css/style.css'
-      ],
-      '<%%= yeoman.app %>/assets': [
-        '<%%= yeoman.drupalSite %>/sites/all/themes/<%%= yeoman.drupalTheme %>/logo.png'
-      ]
-    },
-    replace: {
-      pages: {
-        src: ['<%%= yeoman.app %>/**/*.html'],
-        // Overwrite matched source files
-        overwrite: true,
-        replacements: [{
-          from: '<%%= yeoman.drupalSite %>/<%%= yeoman.drupalMasterBranch %>/',
-          to: '<%%= yeoman.basePath %>'
-        }, {
-          from: '<%%= yeoman.drupalSite %>/',
-          to: '<%%= yeoman.basePath %>'
-        }, {
-          from: '<%%= yeoman.drupalDomain %>/<%%= yeoman.drupalMasterBranch %>/',
-          to: '<%%= yeoman.basePath %>'
-        }, {
-          from: '/<%%= yeoman.drupalDomain %>/',
-          to: '<%%= yeoman.basePath %>'
-        }, {
-          from: /sites\/default\/files\/.*?"/g,
-          to: function(value) {
-            value = value.replace(/\?.*/g, '');
-            // @todo: Improve logic.
-            value = value + '"';
-            return value;
-          }
-        }, {
-          from: '/sites/default/files/',
-          to: '<%%= yeoman.basePath %>assets/'
-        }, {
-          from: 'sites/all/themes/<%%= yeoman.drupalTheme %>/',
-          to: '<%%= yeoman.basePath %>'
-        }]
+      stylesStage: {
+        // "src" will be populated on the fly in the "getAssetsFromHtml" task.
+        src: [],
+        router: function (url) {
+          // Remove "http://example.com/" from the CSS file name.
+          // @todo: Can we remove hardcoding of the value?
+          return url.replace('<%= drupalHost %>/<%= drupalDomain %>', '');
+        },
+        dest: '<%%= yeoman.stage %>/styles'
+      },
+      // @todo: Populate src.
+      scriptsStage: {
+        src: [],
+        dest: '<%%= yeoman.stage %>/scripts'
+      },
+      getAssetsFromHtml: {
+        // "src" will be populated on the fly in the "getAssetsFromHtml" task.
+        src: [],
+        router: function (url) {
+          // Remove query string from the file name (e.g. foo.jpg?token=1234).
+          url = url.replace(/\?.*/g, '');
+          // Remove the Drupal site, and "sites/default/files" from the file name.
+          return url.replace(/http:.*?\/sites\/default\/files/g, '');
+        },
+        dest: '<%%= getAssetsFromHtml.stage.dest %>'
       }
     },
-    getFilesFromHtml: {
-      files: {
-        src: ['<%%= yeoman.app %>/**/*.html'],
-        dest: '<%%= yeoman.app %>/files'
+    replace: {
+      stage: {
+        src: ['<%%= yeoman.stage %>/**/*.html'],
+        // Overwrite matched source files
+        overwrite: true,
+        replacements: [
+          // <link type="css/text" href="http://example.com/sites/all/modules/foo.css" ...
+          {
+            from: '<link type="text/css" rel="stylesheet" href="<%%= yeoman.drupalSite %>',
+            to: '<link type="text/css" rel="stylesheet" href="/styles'
+          },
+          // http://example.com/live/
+          {
+            from: '<%%= yeoman.drupalSite %>/<%%= yeoman.drupalMasterBranch %>/',
+            to: '<%%= yeoman.basePath %>'
+          },
+          // http://example.com/
+          {
+            from: '<%%= yeoman.drupalSite %>/',
+            to: '<%%= yeoman.basePath %>'
+          },
+          // example.com/live/
+          {
+            from: '<%%= yeoman.drupalDomain %>/<%%= yeoman.drupalMasterBranch %>/',
+            to: '<%%= yeoman.basePath %>'
+          },
+          // example.com/
+          {
+            from: '/<%%= yeoman.drupalDomain %>/',
+            to: '<%%= yeoman.basePath %>'
+          },
+          // live
+          {
+            from: 'href="<%%= yeoman.drupalMasterBranch %>"',
+            to: 'href="/"'
+          },
+          {
+            from: /sites\/default\/files\/.*?"/g,
+            to: function(value) {
+              value = value.replace(/\?.*/g, '');
+              // @todo: Improve logic.
+              value = value + '"';
+              return value;
+            }
+          },
+          {
+            from: 'sites/default/files/',
+            to: '<%%= yeoman.basePath %>/assets/'
+          },
+          {
+            from: 'sites/all/themes/<%%= yeoman.drupalTheme %>/',
+            to: '<%%= yeoman.basePath %>'
+          }
+        ]
+      }
+    },
+    getHtml: {
+      stage: {
+        drupalSite: '<%%= yeoman.drupalSite %>',
+        dest: '<%%= yeoman.stage %>'
+      }
+    },
+    getAssetsFromHtml: {
+      stage: {
+        src: '<%%= yeoman.stage %>/**/*.html',
+        dest: '<%%= yeoman.stage %>/assets'
       }
     },
     'gh-pages': {
@@ -372,87 +432,82 @@ module.exports = function (grunt) {
     }
   });
 
-  grunt.registerTask('getHtml', 'Get HTML from Drupal', function() {
-    var yeoman= {
-      'app': grunt.config.get('yeoman.app'),
-      'drupalSite': grunt.config.get('yeoman.drupalSite')
-    };
-
-
+  grunt.registerMultiTask('getHtml', 'Get HTML from Drupal', function() {
     // Task is asynchronous.
-    var done = this.async();
+    var done = this.async(),
+      drupalSite = this.data.drupalSite,
+      self = this;
 
 
-    request(yeoman.drupalSite + '/zariz-pages', function (error, response, body) {
+    request(drupalSite + '/zariz-pages', function (error, response, body) {
       if (error || response.statusCode !== 200) {
         grunt.fail.fatal('Error contacting Drupal site.');
       }
 
-      var urls = JSON.parse(body);
+      var data = JSON.parse(body),
+        config = grunt.config.get('curl') || {};
 
-      var config = {};
-      _.each(urls.insert, function(url) {
-        var key = yeoman.app;
-        if (url !== 'index.php') {
-          // Not the main page.
-          key += '/' + url;
-          key.replace(yeoman.drupalSite, '');
-        }
-
-        key += '/index.html';
-        config[key] = yeoman.drupalSite + '/' + url;
+      // Prefix files with the Drupal site path.
+      var src = [];
+      _.each(data.insert, function(url) {
+        src.push(drupalSite + '/' + url);
       });
 
-      grunt.config.set('curl', config);
-      grunt.task.run([
-        'curl',
-        'getFilesFromHtml',
-        'replace'
-      ]);
+      var config = grunt.config.get('curl-dir') || {};
+      config.getHtml = {
+        src: src,
+        router: function (url) {
+          url += url === 'index.php' ? 'index.html' : '/index.html';
+          return url.replace(drupalSite, '').replace('index.php', '');
+        },
+        dest: self.data.dest
+      };
+
+      grunt.config.set('curl-dir', config);
+      grunt.task.run(['curl-dir:getHtml']);
 
       // Task finished.
       done();
     });
   });
 
-  grunt.registerMultiTask('getFilesFromHtml', 'Get files from a single HTML page', function() {
+  grunt.registerMultiTask('getAssetsFromHtml', 'Gets files from HTML pages', function() {
     // Get the list of files.
-    var sourceFiles = grunt.file.expand(this.data.src);
-    var filePaths = [];
+    var sourceFiles = grunt.file.expand(this.data.src),
+      filesPath = [],
+      stylesPath = [],
+      regExp = /<link type="text\/css".*?href="(http:\/\/.*?)".*?\/>/g,
+      match;
     sourceFiles.forEach(function (pathToSource) {
       var contents = grunt.file.read(pathToSource);
 
-      // Use regex to find files.
-      // @todo: Remove hardcoding of "sites/default/files".
-      var files = contents.match(/"http.*?\/sites\/default\/files\/.*?"/g);
+      // Get files from sites/default/files.
+      var files = contents.match(/http.*?\/sites\/default\/files\/.*?(?:")/g);
 
-      if (!files) {
-        return;
+      if (!!files) {
+        files = _.uniq(files);
+        files.forEach(function(filePath) {
+          filesPath.push(filePath.replace(/\"/g, ''));
+        });
       }
 
-      files = _.uniq(files);
-
-      files.forEach(function(filePath) {
-        filePaths.push(filePath.replace(/\"/g, ''));
-      });
+      // Get CSS files from themes or modules.
+      while (match = regExp.exec(contents)) {
+        stylesPath.push(match[1].replace(/\?.*/g, ''));
+      }
     });
 
+    stylesPath = _.uniq(stylesPath);
 
-    var config = {
-      files: {
-        src: [
-          filePaths
-        ],
-        router: function (url) {
-          url = url.replace(/\?.*/g, '');
-          return url.replace(grunt.config.get('yeoman.drupalSite') + '/sites/default/files', '');
-        },
-        dest: grunt.config.get('yeoman.app') + '/assets'
-      }
-    };
+    var config = grunt.config.get('curl-dir') || {};
+    config.stylesStage.src = [stylesPath];
+    config.getAssetsFromHtml.src = [filesPath];
 
     grunt.config.set('curl-dir', config);
-    return grunt.task.run(['curl-dir']);
+    return grunt.task.run([
+      'curl-dir:getAssetsFromHtml',
+      'curl-dir:stylesStage'
+    ]);
   });
 
 
@@ -482,17 +537,29 @@ module.exports = function (grunt) {
     'connect:test',
   ]);
 
+  // Get files from the Drupal theme.
+  grunt.registerTask('getThemeFiles', [
+    'curl-dir:stylesStage',
+    'curl-dir:scriptsStage'
+  ]);
+
+  grunt.registerTask('stage', [
+    'clean:stage',
+    'getHtml',
+    'getAssetsFromHtml',
+    'getThemeFiles',
+    'replace:stage',
+    'copy:stage'
+  ]);
+
   grunt.registerTask('build', [
-    'clean:dist',
     'useminPrepare',
     'concurrent:dist',
     'autoprefixer',
     'concat',
-    'ngmin',
     'copy:dist',
     'cdnify',
-    'cssmin',
-    'uglify',
+    'imagemin',
     'rev',
     'usemin'
   ]);
