@@ -333,8 +333,8 @@ module.exports = function (grunt) {
         src: [],
         dest: '<%%= yeoman.stage %>/styles'
       },
-      // @todo: Populate src.
       scriptsStage: {
+        // "src" will be populated on the fly in the "getAssetsFromHtml" task.
         src: [],
         dest: '<%%= yeoman.stage %>/scripts'
       },
@@ -379,6 +379,11 @@ module.exports = function (grunt) {
           {
             from: '<%%= yeoman.drupalSite %>/themes/',
             to: '<%%= yeoman.basePath %>/assets/themes/'
+          },
+          // <script type="text/javascript" src="http://example.com/misc/jquery.js
+          {
+            from: '<script type="text/javascript" src="<%%= yeoman.drupalSite %>/',
+            to: '<script type="text/javascript" src="<%%= yeoman.drupalSite %>/scripts/'
           },
           // http://example.com/
           {
@@ -480,9 +485,11 @@ module.exports = function (grunt) {
     var sourceFiles = grunt.file.expand(this.data.src),
       drupalSite = grunt.config.get('yeoman.drupalSite'),
       stylesPath = [],
+      scriptsPath = [],
       imagesPath = [],
       filesPath = [],
       stylesRegExp = /<link type="text\/css".*?href="(http:\/\/.*?)".*?\/>/g,
+      scriptsRegExp = new RegExp('<script type="text\/javascript" src="(' + drupalSite.replace('/', '\/') + '\/.*?)"><\/script>', 'g'),
       imagesRegExp = new RegExp('<img src="(' + drupalSite.replace('/', '\/') + '\/(themes|modules)\/.*?)"', 'g'),
       filesRegExp = /"(http.*?\/sites\/default\/files\/.*?)"/g,
       match;
@@ -492,8 +499,14 @@ module.exports = function (grunt) {
 
       // Get CSS files from themes or modules.
       while (match = stylesRegExp.exec(contents)) {
-        stylesPath.push(match[1].replace(/\?.*/g, ''));
+        stylesPath.push(match[1]);
       }
+
+      // Get JS files from themes or modules.
+      while (match = scriptsRegExp.exec(contents)) {
+        scriptsPath.push(match[1]);
+      }
+
 
       // Get images from modules and themes.
       while (match = imagesRegExp.exec(contents)) {
@@ -508,29 +521,31 @@ module.exports = function (grunt) {
 
 
     stylesPath = _.uniq(stylesPath);
+    scriptsPath = _.uniq(scriptsPath);
     imagesPath = _.uniq(imagesPath);
     filesPath = _.uniq(filesPath);
 
     var config = grunt.config.get('curl-dir') || {};
     config.stylesStage.src = [stylesPath];
+    config.scriptsStage.src = [scriptsPath];
     config.imagesStage.src = [imagesPath];
     config.getAssetsFromHtml.src = [filesPath];
 
     // Add "curl-dir" router.
     var router = function (url) {
-      // Remove "http://example.com/" from the CSS file name.
+      // Remove "http://example.com/" from the CSS file name, and query strings.
       var drupalSite = grunt.config.get('yeoman.drupalSite');
-      return url.replace(drupalSite, '');
+      return url.replace(drupalSite, '').replace(/\?.*/g, '');
     };
 
     config.stylesStage.router = router;
     config.scriptsStage.router = router;
     config.imagesStage.router = router;
 
-
     grunt.config.set('curl-dir', config);
     return grunt.task.run([
       'curl-dir:stylesStage',
+      'curl-dir:scriptsStage',
       'curl-dir:imagesStage',
       'curl-dir:getAssetsFromHtml'
     ]);
