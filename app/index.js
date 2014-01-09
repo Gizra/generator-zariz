@@ -58,25 +58,6 @@ ZarizGenerator.prototype.askForDrupalDomain = function askFor() {
 };
 
 /**
- * Get the Drupal theme name.
- */
-ZarizGenerator.prototype.askForDrupalTheme = function askFor() {
-  var cb = this.async();
-
-  var prompts = [{
-    name: 'drupalTheme',
-    message: 'What is your theme name?',
-    default: 'bootstrap'
-  }];
-
-  this.prompt(prompts, function (props) {
-    this.drupalTheme = props.drupalTheme;
-
-    cb();
-  }.bind(this));
-};
-
-/**
  * Get the static site's base path.
  */
 ZarizGenerator.prototype.askForBasePath = function askFor() {

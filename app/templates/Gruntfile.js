@@ -31,7 +31,6 @@ module.exports = function (grunt) {
       drupalHost: '<%= drupalHost %>',
       drupalDomain: '<%= drupalDomain %>',
       drupalSite: '<%%= yeoman.drupalHost %>/<%%= yeoman.drupalDomain %>',
-      drupalTheme: '<%= drupalTheme %>',
       drupalMasterBranch: '<%= drupalMasterBranch %>',
       basePath: '<%= basePath %>'
     },
@@ -332,17 +331,17 @@ module.exports = function (grunt) {
       stylesStage: {
         // "src" will be populated on the fly in the "getAssetsFromHtml" task.
         src: [],
-        router: function (url) {
-          // Remove "http://example.com/" from the CSS file name.
-          // @todo: Can we remove hardcoding of the value?
-          return url.replace('<%= drupalHost %>/<%= drupalDomain %>', '');
-        },
         dest: '<%%= yeoman.stage %>/styles'
       },
       // @todo: Populate src.
       scriptsStage: {
         src: [],
         dest: '<%%= yeoman.stage %>/scripts'
+      },
+      imagesStage: {
+        // "src" will be populated on the fly in the "getAssetsFromHtml" task.
+        src: [],
+        dest: '<%%= yeoman.stage %>/assets'
       },
       getAssetsFromHtml: {
         // "src" will be populated on the fly in the "getAssetsFromHtml" task.
@@ -370,27 +369,36 @@ module.exports = function (grunt) {
           // http://example.com/live/
           {
             from: '<%%= yeoman.drupalSite %>/<%%= yeoman.drupalMasterBranch %>/',
-            to: '<%%= yeoman.basePath %>'
+            to: '<%%= yeoman.basePath %>/'
+          },
+          // @todo: Change this hack as it should work also for: /modules,
+          // /sites/all/modules, /sites/all/themes
+          // Issue is how to inject drupalSite variable without hardcoding.
+
+          // http://example.com/themes => /assets/themes
+          {
+            from: '<%%= yeoman.drupalSite %>/themes/',
+            to: '<%%= yeoman.basePath %>/assets/themes/'
           },
           // http://example.com/
           {
             from: '<%%= yeoman.drupalSite %>/',
-            to: '<%%= yeoman.basePath %>'
+            to: '<%%= yeoman.basePath %>/'
           },
-          // example.com/live/
+          // /example.com/live/
           {
-            from: '<%%= yeoman.drupalDomain %>/<%%= yeoman.drupalMasterBranch %>/',
-            to: '<%%= yeoman.basePath %>'
+            from: '/<%%= yeoman.drupalDomain %>/<%%= yeoman.drupalMasterBranch %>/',
+            to: '<%%= yeoman.basePath %>/'
           },
-          // example.com/
+          // /example.com/
           {
             from: '/<%%= yeoman.drupalDomain %>/',
-            to: '<%%= yeoman.basePath %>'
+            to: '<%%= yeoman.basePath %>/'
           },
-          // live
+          // href="/live"
           {
-            from: 'href="<%%= yeoman.drupalMasterBranch %>"',
-            to: 'href="/"'
+            from: 'href="/<%%= yeoman.drupalMasterBranch %>"',
+            to: 'href="<%%= yeoman.basePath %>/"'
           },
           {
             from: /sites\/default\/files\/.*?"/g,
@@ -402,12 +410,8 @@ module.exports = function (grunt) {
             }
           },
           {
-            from: 'sites/default/files/',
+            from: '/sites/default/files/',
             to: '<%%= yeoman.basePath %>/assets/'
-          },
-          {
-            from: 'sites/all/themes/<%%= yeoman.drupalTheme %>/',
-            to: '<%%= yeoman.basePath %>'
           }
         ]
       }
@@ -474,42 +478,63 @@ module.exports = function (grunt) {
   grunt.registerMultiTask('getAssetsFromHtml', 'Gets files from HTML pages', function() {
     // Get the list of files.
     var sourceFiles = grunt.file.expand(this.data.src),
-      filesPath = [],
+      drupalSite = grunt.config.get('yeoman.drupalSite'),
       stylesPath = [],
-      regExp = /<link type="text\/css".*?href="(http:\/\/.*?)".*?\/>/g,
+      imagesPath = [],
+      filesPath = [],
+      stylesRegExp = /<link type="text\/css".*?href="(http:\/\/.*?)".*?\/>/g,
+      imagesRegExp = new RegExp('<img src="(' + drupalSite.replace('/', '\/') + '\/(themes|modules)\/.*?)"', 'g'),
+      filesRegExp = /"(http.*?\/sites\/default\/files\/.*?)"/g,
       match;
     sourceFiles.forEach(function (pathToSource) {
       var contents = grunt.file.read(pathToSource);
 
-      // Get files from sites/default/files.
-      var files = contents.match(/http.*?\/sites\/default\/files\/.*?(?:")/g);
-
-      if (!!files) {
-        files = _.uniq(files);
-        files.forEach(function(filePath) {
-          filesPath.push(filePath.replace(/\"/g, ''));
-        });
-      }
 
       // Get CSS files from themes or modules.
-      while (match = regExp.exec(contents)) {
+      while (match = stylesRegExp.exec(contents)) {
         stylesPath.push(match[1].replace(/\?.*/g, ''));
+      }
+
+      // Get images from modules and themes.
+      while (match = imagesRegExp.exec(contents)) {
+        imagesPath.push(match[1]);
+      }
+
+      // Get files from sites/default/files.
+      while (match = filesRegExp.exec(contents)) {
+        filesPath.push(match[1]);
       }
     });
 
+
     stylesPath = _.uniq(stylesPath);
+    imagesPath = _.uniq(imagesPath);
+    filesPath = _.uniq(filesPath);
 
     var config = grunt.config.get('curl-dir') || {};
     config.stylesStage.src = [stylesPath];
+    config.imagesStage.src = [imagesPath];
     config.getAssetsFromHtml.src = [filesPath];
+
+    // Add "curl-dir" router.
+    var router = function (url) {
+      // Remove "http://example.com/" from the CSS file name.
+      var drupalSite = grunt.config.get('yeoman.drupalSite');
+      return url.replace(drupalSite, '');
+    };
+
+    config.stylesStage.router = router;
+    config.scriptsStage.router = router;
+    config.imagesStage.router = router;
+
 
     grunt.config.set('curl-dir', config);
     return grunt.task.run([
-      'curl-dir:getAssetsFromHtml',
-      'curl-dir:stylesStage'
+      'curl-dir:stylesStage',
+      'curl-dir:imagesStage',
+      'curl-dir:getAssetsFromHtml'
     ]);
   });
-
 
   grunt.registerTask('serve', function (target) {
     if (target === 'dist') {
