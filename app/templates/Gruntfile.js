@@ -427,6 +427,15 @@ module.exports = function (grunt) {
 
 
     request(drupalSite + '/zariz-pages', function (error, response, body) {
+      try {
+        // Assert we got a valid JSON.
+        JSON.parse(body);
+      }
+      catch(e)
+      {
+        error = true;
+      }
+
       if (error || response.statusCode !== 200) {
         grunt.fail.fatal('Error contacting Drupal site.');
       }
