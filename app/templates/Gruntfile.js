@@ -373,6 +373,10 @@ module.exports = function (grunt) {
             from: '/<%%= yeoman.drupalDomain %>/<%%= yeoman.drupalMasterBranch %>/',
             to: '<%%= yeoman.basePath %>/'
           },
+          {
+            from: '/<%= yeoman.drupalMasterBranch %>/',
+            to: '<%= yeoman.basePath %>/'
+          },
           // /example.com/
           {
             from: '/<%%= yeoman.drupalDomain %>/',
