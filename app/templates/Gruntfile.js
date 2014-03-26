@@ -374,8 +374,8 @@ module.exports = function (grunt) {
             to: '<%%= yeoman.basePath %>/'
           },
           {
-            from: '/<%= yeoman.drupalMasterBranch %>/',
-            to: '<%= yeoman.basePath %>/'
+            from: '/<%%= yeoman.drupalMasterBranch %>/',
+            to: '<%%= yeoman.basePath %>/'
           },
           // /example.com/
           {
